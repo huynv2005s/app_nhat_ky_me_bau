@@ -1,9 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const connectDB = require("./src/config/db");
 const userModule = require("./src/modules/user.module");
 const { default: mongoose } = require("mongoose");
-
+const jwt = require('jsonwebtoken');
 dotenv.config(); // đọc file .env
 
 const app = express();
@@ -34,7 +33,35 @@ app.post('/api/auth/register', async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 });
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
 
+        const user = await userModule.findOne({ email, password });
+        if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+
+
+
+        // Tạo token
+        const payload = { id: user._id, email: user.email };
+        const accessToken = jwt.sign(payload, "my-app", { expiresIn: "7d" || '1h' });
+
+        // (Tuỳ chọn) tạo refresh token và lưu vào DB
+        // const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        // user.refreshToken = refreshToken;
+        // await user.save();
+
+        return res.json({
+            message: 'Login successful',
+            accessToken,
+            // refreshToken
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
 const PORT = process.env.PORT || 5000;
 mongoose
     .connect(process.env.MONGO_URI)
