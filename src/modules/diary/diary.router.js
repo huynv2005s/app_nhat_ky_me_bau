@@ -62,7 +62,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
         if (diary.userId.toString() !== req.user.id) {
             return res.status(403).json({ message: "Forbidden" });
         }
-        await diary.remove();
+        await Diary.findByIdAndDelete(id);
         return res.status(200).json({ message: "Diary deleted" });
     } catch (error) {
         return res.status(500).json({ message: "Server error" });
