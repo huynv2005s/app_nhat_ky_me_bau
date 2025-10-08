@@ -28,7 +28,24 @@ router.get("/", async (req, res) => {
     }
 });
 // Lấy nhật ký theo ID
-router.get("/:id", verifyToken, async (req, res) => { });
+router.get("/", verifyToken, async (req, res) => {
+    try {
+        const { category } = req.query; // Lấy từ ?category=xxx
+        let articles;
+        console.log("vsdv");
+        if (category) {
+            articles = await Article.find({ category });
+        } else {
+            articles = await Article.find();
+        }
+        return res.status(201).json({ message: "Diary created", article: newDiary });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+
+});
+
 // Cập nhật nhật ký
 router.put("/:id", verifyToken, async (req, res) => {
     try {
