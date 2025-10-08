@@ -7,6 +7,7 @@ dotenv.config(); // đọc file .env
 
 const app = express();
 const cors = require("cors");
+const { verifyToken } = require("./src/middleware/auth");
 app.use(cors());
 app.use(express.json());
 
@@ -60,6 +61,36 @@ app.post('/api/auth/login', async (req, res) => {
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });
+    }
+});
+app.put('/api/auth/updateInfo', verifyToken, async (req, res) => {
+    try {
+        const { dueDate, babyName, gender, pregnancyWeek } = req.body;
+        const userId = req.user.id;
+        const updatedUser = await userModule.findByIdAndUpdate(
+            userId,
+            {
+                dueDate,
+                baby: { name: babyName, gender },
+                pregnancyWeek,
+            },
+            { new: true }
+        );
+
+        res.json({ message: "Update success", user: updatedUser });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+app.post('/api/auth/me', verifyToken, async (req, res) => {
+    try {
+
+        const userId = req.user.id;
+        const updatedUser = await userModule.findById(userId);
+
+        res.json({ message: "Update success", user: updatedUser });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 app.use("/api/diaries", require("./src/modules/diary/diary.router"));
