@@ -19,14 +19,7 @@ router.post("/", async (req, res) => {
     }
 });
 // Lấy tất cả nhật ký của user
-router.get("/", async (req, res) => {
-    try {
-        const newDiary = await Article.find();
-        return res.status(201).json({ message: "Diary created", article: newDiary });
-    } catch (error) {
-        return res.status(500).json({ message: "Server error" });
-    }
-});
+
 // Lấy nhật ký theo ID
 router.get("/", verifyToken, async (req, res) => {
     try {
@@ -38,7 +31,7 @@ router.get("/", verifyToken, async (req, res) => {
         } else {
             articles = await Article.find();
         }
-        return res.status(201).json({ message: "Diary created", article: newDiary });
+        return res.status(201).json({ message: "Diary created", article: articles });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Server error" });
