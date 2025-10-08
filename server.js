@@ -28,7 +28,20 @@ app.post('/api/auth/register', async (req, res) => {
         const user = new userModule({ email, password, name });
         await user.save();
 
-        return res.status(201).json({ message: 'User created' });
+        const payload = { id: user._id, email: user.email };
+        const accessToken = jwt.sign(payload, "my-app", { expiresIn: "7d" || '1h' });
+
+        // (Tuỳ chọn) tạo refresh token và lưu vào DB
+        // const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        // user.refreshToken = refreshToken;
+        // await user.save();
+
+        return res.json({
+            message: 'Login successful',
+            accessToken,
+            // refreshToken
+            user
+        });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: 'Server error' });
@@ -57,6 +70,7 @@ app.post('/api/auth/login', async (req, res) => {
             message: 'Login successful',
             accessToken,
             // refreshToken
+            user
         });
     } catch (err) {
         console.error(err);
