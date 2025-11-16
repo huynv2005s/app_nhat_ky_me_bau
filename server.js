@@ -107,6 +107,30 @@ app.post('/api/auth/me', verifyToken, async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+app.get("/api/getTimeEnd",(req,res)=>{
+  let eddString = req.query.date;
+const edd = new Date(eddString);
+
+  // 1. Tính LMP (280 ngày trước EDD)
+  const LMP = new Date(edd.getTime() - 280 * 24 * 60 * 60 * 1000);
+
+  const today = new Date();
+
+  // 2. Tuổi thai
+  const diffDays = Math.floor((today.getTime() - LMP.getTime()) / (1000 * 60 * 60 * 24));
+  const weeks = Math.floor(diffDays / 7);
+  const days = diffDays % 7;
+
+  // 3. Ngày còn lại đến sinh
+  const daysLeft = Math.ceil((edd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+//   return { weeks, days, daysLeft };
+
+  return res.json({ weeks, days,daysLeft });
+
+
+// console.log(getGestationalAgeByEDD("2025-12-10"));
+});
 app.use("/api/diaries", require("./src/modules/diary/diary.router"));
 app.use("/api/articles", require("./src/modules/article/article.router"));
 const PORT = process.env.PORT || 5000;
