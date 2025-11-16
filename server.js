@@ -58,7 +58,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 
         // Tạo token
-        const payload = { id: user._id, email: user.email };
+        const payload = { id: user._id, email: user.email , dueDate: user.dueDate};
         const accessToken = jwt.sign(payload, "my-app", { expiresIn: "7d" || '1h' });
 
         // (Tuỳ chọn) tạo refresh token và lưu vào DB
@@ -107,12 +107,15 @@ app.post('/api/auth/me', verifyToken, async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-app.get("/api/getTimeEnd",(req,res)=>{
-  let eddString = req.query.date;
-const edd = new Date(eddString);
-
+app.get("/api/getTimeEnd",verifyToken, async(req,res)=>{
+//   let eddString = req.query.date;
+const id = req.user.id;
+const user = await userModule.findById(id)
+const edd = new Date(user.dueDate);
+console.log(edd);
+console.log(user);
   // 1. Tính LMP (280 ngày trước EDD)
-  const LMP = new Date(edd.getTime() - 280 * 24 * 60 * 60 * 1000);
+ const LMP = new Date(edd.getTime() - 280 * 24 * 60 * 60 * 1000);
 
   const today = new Date();
 
