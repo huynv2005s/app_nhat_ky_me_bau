@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 // Lấy tất cả nhật ký của user
 
 // Lấy nhật ký theo ID
-router.get("/", verifyToken, async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const { category } = req.query; // Lấy từ ?category=xxx
         let articles;

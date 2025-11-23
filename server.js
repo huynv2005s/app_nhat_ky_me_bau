@@ -54,18 +54,9 @@ app.post('/api/auth/login', async (req, res) => {
 
         const user = await userModule.findOne({ email, password });
         if (!user) return res.status(401).json({ message: 'Invalid credentials' });
-
-
-
         // Tạo token
         const payload = { id: user._id, email: user.email };
         const accessToken = jwt.sign(payload, "my-app", { expiresIn: "7d" || '1h' });
-
-        // (Tuỳ chọn) tạo refresh token và lưu vào DB
-        // const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-        // user.refreshToken = refreshToken;
-        // await user.save();
-
         return res.json({
             message: 'Login successful',
             accessToken,
@@ -79,14 +70,13 @@ app.post('/api/auth/login', async (req, res) => {
 });
 app.put('/api/auth/updateInfo', verifyToken, async (req, res) => {
     try {
-        const { dueDate, babyName, gender, pregnancyWeek } = req.body;
+        const { dueDate, babyName, gender } = req.body;
         const userId = req.user.id;
         const updatedUser = await userModule.findByIdAndUpdate(
             userId,
             {
                 dueDate,
                 baby: { name: babyName, gender },
-                pregnancyWeek,
             },
             { new: true }
         );
