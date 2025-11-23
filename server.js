@@ -55,7 +55,7 @@ app.post('/api/auth/login', async (req, res) => {
         const user = await userModule.findOne({ email, password });
         if (!user) return res.status(401).json({ message: 'Invalid credentials' });
         // Tạo token
-        const payload = { id: user._id, email: user.email };
+        const payload = { id: user._id, email: user.email , dueDate: user.dueDate};
         const accessToken = jwt.sign(payload, "my-app", { expiresIn: "7d" || '1h' });
         return res.json({
             message: 'Login successful',
@@ -96,6 +96,33 @@ app.post('/api/auth/me', verifyToken, async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+app.get("/api/getTimeEnd",verifyToken, async(req,res)=>{
+//   let eddString = req.query.date;
+const id = req.user.id;
+const user = await userModule.findById(id)
+const edd = new Date(user.dueDate);
+console.log(edd);
+console.log(user);
+  // 1. Tính LMP (280 ngày trước EDD)
+ const LMP = new Date(edd.getTime() - 280 * 24 * 60 * 60 * 1000);
+
+  const today = new Date();
+
+  // 2. Tuổi thai
+  const diffDays = Math.floor((today.getTime() - LMP.getTime()) / (1000 * 60 * 60 * 24));
+  const weeks = Math.floor(diffDays / 7);
+  const days = diffDays % 7;
+
+  // 3. Ngày còn lại đến sinh
+  const daysLeft = Math.ceil((edd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+
+//   return { weeks, days, daysLeft };
+
+  return res.json({ weeks, days,daysLeft });
+
+
+// console.log(getGestationalAgeByEDD("2025-12-10"));
 });
 app.use("/api/diaries", require("./src/modules/diary/diary.router"));
 app.use("/api/articles", require("./src/modules/article/article.router"));
