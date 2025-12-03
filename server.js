@@ -113,13 +113,13 @@ console.log(user);
   const diffDays = Math.floor((today.getTime() - LMP.getTime()) / (1000 * 60 * 60 * 24));
   const weeks = Math.floor(diffDays / 7);
   const days = diffDays % 7;
-
+  const months = Math.ceil(diffDays / 30);
   // 3. Ngày còn lại đến sinh
   const daysLeft = Math.ceil((edd.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
 //   return { weeks, days, daysLeft };
 
-  return res.json({ weeks, days,daysLeft });
+  return res.json({ weeks, days,months,daysLeft });
 
 
 // console.log(getGestationalAgeByEDD("2025-12-10"));
